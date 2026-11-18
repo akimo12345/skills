@@ -130,6 +130,15 @@ function stripClaudeFrontmatter(content: string): { frontmatter: Record<string, 
 export default async function ClaudeBridgePlugin({ directory }: { directory: string }) {
   return {
     config: async (cfg: Record<string, any>) => {
+      // Master switch: run only when the Claude Code compatibility layer is
+      // enabled (cfg.claudeCodeCompat — written by the extension's Settings
+      // toggle into the global mycoder.json, or set directly by CLI users).
+      // The preset preinstall keeps this plugin present but inert while the
+      // switch is off.
+      if (cfg.claudeCodeCompat !== true) {
+        console.log("[claude-bridge] idle (claudeCodeCompat is not enabled)")
+        return
+      }
       // Part 3: Rules — zero-copy via instructions (no AGENTS.md generation)
       // Project: one recursive glob (verified: `**` matches via the relative branch).
       // Global: mycoder's instruction loader reduces absolute paths to basename,
